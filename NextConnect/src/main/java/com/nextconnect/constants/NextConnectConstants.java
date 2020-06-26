@@ -7,4 +7,5 @@ public class NextConnectConstants {
 	public static final String USER_ID = "USER_ID";
 	public static final String LIKE_FLAG = "LIKE_FLAG";
 	public static final String LIKE_FLAG_VALUE= "ADD";
+	public static final String PAGE_NUM_DEFAULT_SIZE= "10";
 }

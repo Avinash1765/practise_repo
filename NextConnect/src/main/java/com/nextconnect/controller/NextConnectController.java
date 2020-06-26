@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +24,7 @@ import com.nextconnect.dto.Following;
 import com.nextconnect.dto.Post;
 import com.nextconnect.dto.UserDetails;
 import com.nextconnect.dto.UserFeedDto;
+import com.nextconnect.repos.BrowseUserRepo;
 import com.nextconnect.repos.CommentsRepo;
 import com.nextconnect.repos.FollowingRepo;
 import com.nextconnect.repos.PostRepo;
@@ -44,6 +49,20 @@ public class NextConnectController {
 	
 	@Autowired
 	private LikeUpdateService likeUpdateService;
+	
+	@Autowired
+	private BrowseUserRepo browserUserRepo;
+	
+	@RequestMapping(value="/get-user-list")
+	public List<UserDetails> findUsersToBrowse(@RequestParam("pageNo") Integer pageNum, 
+			@RequestParam(name = "pageSize", required = false, defaultValue = NextConnectConstants.PAGE_NUM_DEFAULT_SIZE) Integer pageSize){
+		Pageable pageable= PageRequest.of(pageNum, pageSize, Sort.by("userId"));
+		Page<UserDetails> userDetailsPage=browserUserRepo.findAll(pageable);
+		
+		System.out.println(userDetailsPage);
+		
+		return userDetailsPage.get().collect(Collectors.toList());
+	}
 
 	@RequestMapping(value = "/new-like/{POST_ID_FOR_LIKE}/{USER_ID}")
 	public void updateLikeCount(@PathVariable(NextConnectConstants.POST_ID_FOR_LIKE) Integer postId,
