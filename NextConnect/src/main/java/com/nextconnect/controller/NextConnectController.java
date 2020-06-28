@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +31,6 @@ import com.nextconnect.repos.UserRepository;
 import com.nextconnect.service.LikeUpdateService;
 
 @RestController
-@CrossOrigin(origins={"http://localhost:3000"})
 public class NextConnectController {
 
 	@Autowired
