@@ -59,8 +59,8 @@ class NavBar extends Component {
       }
 
     onSuccess = (googleUser) => {
-       let name=googleUser.getBasicProfile().getName().split(' ')[0];
-       let actName=name.charAt(0).toUpperCase() + name.slice(1);
+    //   let name=googleUser.getBasicProfile().getName().split(' ')[0];
+    //   let actName=name.charAt(0).toUpperCase() + name.slice(1);
         console.log('mailid is ',googleUser.getBasicProfile().getEmail());
         console.log('url is ', googleUser.getBasicProfile().getImageUrl());
         console.log('name is ',googleUser.getBasicProfile().getName().split(' ')[0]);

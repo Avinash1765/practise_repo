@@ -30,9 +30,9 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state) => {
   return {
-    posts : state.posts,
-    currentUserImage: state.userImageUrl,
-    currentUserId: state.userId
+    posts : state.post.posts,
+    currentUserImage: state.user.userImageUrl,
+    currentUserId: state.user.userId
   }
 }
 

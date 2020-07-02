@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
 import {makeStyles} from '@material-ui/core/styles';
@@ -11,7 +11,7 @@ import createCommentInDB from '../../ActionCreators/CommentActions';
   const commentStyles= makeStyles({
       'userAvatar' : {
           display: 'inline-block',
-          padding: '1rem'      
+          padding: '1rem'
       },
       'commentInput': {
           display: 'inline-block'
@@ -23,13 +23,17 @@ import createCommentInDB from '../../ActionCreators/CommentActions';
 
 const comment= ({postId, type, userImageUrl, commentByUserId, commentText, commentedUserName, commentSubmitFn}) => {
 
-  const userId=useSelector(state => state.userId);
+  const userId=useSelector(state => state.user.userId);
+
+  const currentUserName=useSelector(state => state.user.userName);
+  const currentUserImageUrl=useSelector(state => state.user.userImageUrl);
+  const currentUserMailId=useSelector(state => state.user.userMailId);
+
   const dispatch= useDispatch();
 
   const commentTextRef= useRef({});
 
   useEffect(() => {
-    //  console.log(commentTextRef.current);
       commentTextRef.current.value='';
   });
 
@@ -37,7 +41,8 @@ const comment= ({postId, type, userImageUrl, commentByUserId, commentText, comme
     if(event.keyCode === 13){
           event.preventDefault();
           let commentText= commentTextRef.current.value;
-          dispatch(createCommentInDB(commentText, userId, postId));
+          dispatch(createCommentInDB(commentText, userId, postId,
+            currentUserName, currentUserMailId, currentUserImageUrl));
       }
   }
 

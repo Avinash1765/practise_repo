@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import CreatePost from '../../Components/CreatePost/CreatePost';
 import {storePostToDB} from '../../ActionCreators/PostsActions';
 import {fetchBrowseUsers} from '../../ActionCreators/UserActions';
-import {CREATING_POST_FLAG, FETCH_BROWSE_USERS} from '../../NextConnectConstants';
+import {CREATING_POST_FLAG} from '../../NextConnectConstants';
 import UserFeedPosts from '../UserFeedPosts/UserFeedPosts';
 import BrowserUsers from '../../Components/BrowseUsers/BrowseUsers';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -91,11 +91,11 @@ class UserFeed extends PureComponent {
 
 const mapStateToProps= (state) => {
   return {
-    userImageUrl: state.userImageUrl,
-    userName: state.userName,
-    userId: state.userId,
-    creatingPost: state.creatingPost,
-    browseUserList: state.browseUserList
+    userImageUrl: state.user.userImageUrl,
+    userName: state.user.userName,
+    userId: state.user.userId,
+    creatingPost: state.post.creatingPost,
+    browseUserList: state.user.browseUserList
   }
 }
 

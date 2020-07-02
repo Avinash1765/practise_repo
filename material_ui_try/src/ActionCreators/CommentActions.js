@@ -1,6 +1,6 @@
 import axios from '../axios/axiosinstance';
 import {STORE_COMMENT} from '../NextConnectConstants';
-export default function createCommentInDB(commentText, userId, postId){
+export default function createCommentInDB(commentText, userId, postId, userName, userMail, userImageUrl){
 
   let commentPostObj= {};
   commentPostObj['commentText']= commentText;
@@ -15,7 +15,7 @@ export default function createCommentInDB(commentText, userId, postId){
 
   return function(dispatch){
       axios.post('/add-comment', commentPostObj).then((response) => {
-            dispatch(storeCommentInStore(response.data));
+            dispatch(storeCommentInStore(response.data, userImageUrl, userMail, userName));
         }).catch((error) => {
           console.log(error);
         })
@@ -23,6 +23,7 @@ export default function createCommentInDB(commentText, userId, postId){
 
 }
 
-function storeCommentInStore(commentRespObj){
-    return {type: STORE_COMMENT, data: commentRespObj};
+function storeCommentInStore(commentRespObj, userImageUrl, userMail, userName){
+    return {type: STORE_COMMENT, data: commentRespObj, userData:
+    {userMail: userMail, userName: userName, userImageUrl: userImageUrl}};
 }

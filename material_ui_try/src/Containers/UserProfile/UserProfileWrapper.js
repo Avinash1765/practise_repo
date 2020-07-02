@@ -9,7 +9,7 @@ class UserProfileWrapper extends PureComponent {
   }
 
   render(){
-      let userId= parseInt(this.props.match.params.userId);
+      let userId= parseInt(this.props.match.params.userId,10);
       let userName= this.props.userName;
       let postsToShow= this.props.posts;
       let userMailId= this.props.userMailId;
@@ -43,12 +43,12 @@ class UserProfileWrapper extends PureComponent {
 
 const mapStateToProps = (state) => {
   return {
-    currentUserId: state.userId,
-    userMailId: state.userMailId,
-    userName: state.userName,
-    userImageUrl: state.userImageUrl,
-    posts: state.posts,
-    followingUserList: state.followingUserList
+    currentUserId: state.user.userId,
+    userMailId: state.user.userMailId,
+    userName: state.user.userName,
+    userImageUrl: state.user.userImageUrl,
+    posts: state.post.posts,
+    followingUserList: state.user.followingUserList
   }
 }
 

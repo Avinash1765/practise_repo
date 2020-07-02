@@ -127,7 +127,7 @@ function post(props) {
             </Box>
             <Box className={classes.postContentContainer}>
                 <p>{props.post.postContent}</p><br/>
-                <a href="#" onClick={(event) => {
+                <a onClick={(event) => {
                   event.preventDefault();
                   dispatch(updateLikeC(props.post.postId, props.currentUserId));
                 }}><i className={likeIconClasses} ref={likeIconRef}></i></a>

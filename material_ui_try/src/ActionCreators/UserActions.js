@@ -16,11 +16,13 @@ function updateUsersToBrowseInStore(pageNum, userList){
   return {type: FETCH_BROWSE_USERS, data: {pageNum: pageNum , userList:userList}};
 }
 export function fetchUserFeed(userMailId){
+    console.log(userMailId);
     return function(dispatch){
       axios.get('/get-user-details', {
         params:{
           userMailId: userMailId}
       }).then((response) => {
+          console.log(response.data);
           dispatch(updateUserDetails(response.data));
       }).catch((error) => {
         console.log('actually buddy, error occured ', error);
@@ -46,8 +48,8 @@ function updateFollowingStatus(currentUserId, followingUserId, followingFlag
 
 function fetchBrowseUsers(pageNum){
     return function(dispatch){
-      axios.get('/get-user-list', {params:{'pageNo': pageNum}}).
-      then((response) => {
+      axios.get('/get-user-list', {params:{'pageNo': pageNum}})
+      .then((response) => {
           dispatch(updateUsersToBrowseInStore(pageNum, response.data));
       }).catch((err) => {
         console.log(err);

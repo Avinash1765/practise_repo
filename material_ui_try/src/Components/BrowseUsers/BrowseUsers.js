@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import {makeStyles} from '@material-ui/core/styles';
 
@@ -40,10 +39,10 @@ const browseUsers = ({currentPageNum, userList, getNextPageDetails, isLoading, f
           );
         })}
 
-        { currentPageNum > 0 ? <a href='#' onClick={(eve) => {eve.preventDefault();
+        { currentPageNum > 0 ? <a onClick={(eve) => {eve.preventDefault();
           getNextPageDetails(currentPageNum-1); }} >Prev</a> : null }
 
-        <a href='#' onClick={(eve) => {eve.preventDefault();
+        <a onClick={(eve) => {eve.preventDefault();
           getNextPageDetails(currentPageNum+1);}}>Next</a>
     </div>
   );
