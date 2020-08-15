@@ -24,10 +24,12 @@ public class WebSecurityConfig2 extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().authorizeRequests().
+		antMatchers("/give-random-data","/h2-console/**").permitAll().
 		antMatchers("/**").authenticated().and().httpBasic()
 		  .authenticationEntryPoint(authEntryPoint)
 		  .and().csrf().disable();
 		
+		http.headers().frameOptions().sameOrigin();
 	}
 
 	@Bean
