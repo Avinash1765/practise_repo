@@ -9,9 +9,10 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import {connect} from 'react-redux';
-import {fetchUserFeed} from '../../ActionCreators/UserActions';
+import {fetchUserFeed, updateNumUsers} from '../../ActionCreators/UserActions';
 import Avatar from '@material-ui/core/Avatar';
 import {Link} from 'react-router-dom';
+import {subscribeToNotifications} from '../Utilities/notification';
 
 const navStyle= {
   navbar: {
@@ -39,8 +40,28 @@ const navStyle= {
   };
 
 class NavBar extends Component {
+  eventSrc=null;
+
+  retriggerconnection(){
+
+    if(!this.eventSrc){
+    this.eventSrc=new EventSource("http://localhost:8080/give-random-data");
+
+    this.eventSrc.addEventListener("my sse event", (eve) => {
+      let finalNum=JSON.parse(eve.data).num;
+      this.props.updatePollUsers(finalNum);
+    });
+
+    this.eventSrc.onopen = () => {
+      console.log('atleast opened');
+    }
+  }
+  }
 
   componentDidMount() {
+        console.log('mount triggered');
+//this.retriggerconnection();
+
         window.gapi.load('auth2', () => {
             window.gapi.auth2.init({
             client_id: '253897380785-95rbdhccmoa711fh0jbvi029hmocovoj.apps.googleusercontent.com'
@@ -70,7 +91,36 @@ class NavBar extends Component {
 
     }
 
+    // componentWillUnmount(){
+    //   console.log('yes in unmount');
+    //   this.eventSrc.close();
+    // }
+
+    // componentDidUpdate(){
+    //   console.log('yes in unmount');
+    //   this.eventSrc.close();
+    //
+    //   this.eventSrc=new EventSource("http://localhost:8080/give-random-data");
+    //
+    //   this.eventSrc.addEventListener("my sse event", (eve) => {
+    //     let finalNum=JSON.parse(eve.data).num;
+    //     this.props.updatePollUsers(finalNum);
+    //   });
+    //
+    //   this.eventSrc.onopen = () => {
+    //     console.log('atleast opened');
+    //   }
+    // }
+
+    // componentDidUpdate(){
+    //    console.log('yes in unmount');
+    //    this.eventSrc.close();
+    //
+    //   this.retriggerconnection();
+    //  }
+
     render() {
+      console.log(this.props.numUsers);
       let navBarRightSection = (
         <Grid className={this.props.classes.grid1}>
             <Box  id="my-signIn" />
@@ -99,6 +149,10 @@ class NavBar extends Component {
             <Typography variant='h5'>
             <Link to='/' style={{color:'white','textDecoration':'none'}}>NextConnect</Link>
             </Typography>
+            <Typography variant='h5'>Num Users Supporting: {this.props.numUsers}</Typography>
+            <Button variant='contained' onClick={() => subscribeToNotifications(this.props.userId)}
+             color={this.props.feedNotifications ? 'secondary' : 'primary'}
+            >{this.props.feedNotifications ? 'UNSUBSCRIBE' : 'SUBSCRIBE'}</Button>
           </Grid>
           {navBarRightSection}
         </ToolBar>
@@ -110,15 +164,19 @@ class NavBar extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return {userName: state.userName,
-  userImage: state.userImageUrl,
-  isAuth: state.isAuthenticated
+  return {userName: state.user.userName,
+  userImage: state.user.userImageUrl,
+  isAuth: state.user.isAuthenticated,
+  numUsers: state.user.pollNumber,
+  feedNotifications: state.user.feedNotifications,
+  userId: state.user.userId
   };
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchUserDetails : (mailId) => { dispatch(fetchUserFeed(mailId))}
+    fetchUserDetails : (mailId) => { dispatch(fetchUserFeed(mailId))},
+    updatePollUsers: (numUsers) => {dispatch(updateNumUsers(numUsers))}
   };
 }
 
