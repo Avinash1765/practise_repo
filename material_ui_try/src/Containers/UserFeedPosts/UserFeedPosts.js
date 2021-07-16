@@ -15,7 +15,7 @@ class UserFeedPosts extends React.PureComponent {
   }
 
   render() {
-    console.log('user posts rendered');
+  //  console.log('user posts rendered');
     return this.props.posts.map((post) => {
       return (
         <Box key = {post.postId} ><Post post = {post} currentUserId={this.props.currentUserId} currentUserImage={this.props.currentUserImage}/></Box>

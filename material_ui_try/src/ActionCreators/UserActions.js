@@ -1,4 +1,4 @@
-import {USER_FEED_UPDATE, TOGGLE_FOLLOWING, FETCH_BROWSE_USERS} from '../NextConnectConstants';
+import {USER_FEED_UPDATE, TOGGLE_FOLLOWING, FETCH_BROWSE_USERS, POLL_DATA} from '../NextConnectConstants';
 import axios from '../axios/axiosinstance';
 
 function updateUserDetails(userFeedObj) {
@@ -15,6 +15,13 @@ function updateUserFollowingInStore(followingUserId, followingFlag, followingUse
 function updateUsersToBrowseInStore(pageNum, userList){
   return {type: FETCH_BROWSE_USERS, data: {pageNum: pageNum , userList:userList}};
 }
+
+function updateNumUsers(numUsers){
+//  console.log(numUsers);
+  return {type: POLL_DATA, data: {num: numUsers}};
+}
+
+
 export function fetchUserFeed(userMailId){
     console.log(userMailId);
     return function(dispatch){
@@ -57,4 +64,4 @@ function fetchBrowseUsers(pageNum){
     }
 }
 
-export {updateUserDetails, updateFollowingStatus, fetchBrowseUsers};
+export {updateUserDetails, updateFollowingStatus, fetchBrowseUsers, updateNumUsers};

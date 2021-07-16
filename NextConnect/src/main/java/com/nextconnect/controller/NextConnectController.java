@@ -1,25 +1,42 @@
 package com.nextconnect.controller;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
+import com.nextconnect.config.FcmClient;
 import com.nextconnect.constants.NextConnectConstants;
 import com.nextconnect.constants.StatusEnum;
 import com.nextconnect.dto.Comments;
 import com.nextconnect.dto.Following;
+import com.nextconnect.dto.Joke;
+import com.nextconnect.dto.MessagingToken;
 import com.nextconnect.dto.Post;
 import com.nextconnect.dto.UserDetails;
 import com.nextconnect.dto.UserFeedDto;
@@ -27,8 +44,10 @@ import com.nextconnect.repos.BrowseUserRepo;
 import com.nextconnect.repos.CommentsRepo;
 import com.nextconnect.repos.FollowingRepo;
 import com.nextconnect.repos.PostRepo;
+import com.nextconnect.repos.TokenRepo;
 import com.nextconnect.repos.UserRepository;
 import com.nextconnect.service.LikeUpdateService;
+
 
 @RestController
 public class NextConnectController {
@@ -50,6 +69,94 @@ public class NextConnectController {
 	
 	@Autowired
 	private BrowseUserRepo browserUserRepo;
+	
+	@Autowired
+	private TokenRepo tokenRepo;
+	
+	@Autowired
+	private FcmClient fcmClient;
+	
+	/*
+	 * @Autowired private SseEmitter emitterBkup;
+	 */
+	
+	@Qualifier(value = "myRestClient")
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	private Set<SseEmitter> emiterSet= new HashSet<>();
+	
+	@Scheduled(fixedDelay = 30000)
+	public void fetchJokeAndPushNotification() {
+		ResponseEntity<Joke> respObj=restTemplate.getForEntity("http://api.icndb.com/jokes/random", Joke.class);
+		System.out.println(respObj);
+		
+		Map<String, String> map=new HashMap<>();
+		map.put("my joke is ", respObj.getBody().getJokeData().getJoke());
+		try {
+			fcmClient.send(map);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	
+	@RequestMapping(value = "/give-random-data")
+	public SseEmitter publishRandomNumbers() {
+		
+		SseEmitter emitterBkup= new SseEmitter();
+		
+		emiterSet.add(emitterBkup);
+		
+		emitterBkup.onCompletion(() -> {
+			System.out.println("did reached here");
+			emiterSet.remove(emitterBkup);
+		});
+		//emitterBkup= emitterBkup == null ? new SseEmitter(Long.MAX_VALUE) : emitterBkup;
+		
+		ExecutorService executor= Executors.newSingleThreadExecutor();
+		
+		executor.execute(() -> {
+			
+			for(;true;) {
+			try {
+			Thread.sleep(3000);
+			
+			double val=Math.random() * 600;
+			
+			Integer finalVal=400 + ((int)val);
+			
+			SseEventBuilder event = SseEmitter.event().data(new MyData().setNum(finalVal)).name("my sse event");
+			System.out.println("from scheuled task" + finalVal);
+			
+			for(SseEmitter currentEmitter: emiterSet) {
+				System.out.println(" emitter set size "+emiterSet.size()+ " and thered name:: "+ Thread.currentThread().getName());
+				currentEmitter.send(event);
+			}
+			}catch(Exception e) {
+				System.out.println("unexpected in "+ e);		
+			}		
+			}
+		});
+		return emitterBkup;
+	}
+	
+	@GetMapping(path = "/store-token")
+	public void storeTokenInDB(@RequestParam("MSG_TOKEN") String messagingToken, @RequestParam("USER_ID") Integer userId) {
+		MessagingToken msgToken= new MessagingToken();
+		msgToken.setMessagingToken(messagingToken);
+		
+		UserDetails udet= new UserDetails();
+		udet.setUserId(userId);
+		msgToken.setUser(udet);
+		
+		MessagingToken savedToken=tokenRepo.save(msgToken);
+		
+		System.out.println(savedToken);
+	}
 	
 	@RequestMapping(value="/get-user-list")
 	public List<UserDetails> findUsersToBrowse(@RequestParam("pageNo") Integer pageNum, 
@@ -154,4 +261,22 @@ public class NextConnectController {
 	
 	
 
+}
+
+class MyData {
+	private Integer num;
+
+	public int getNum() {
+		return num;
+	}
+
+	public MyData setNum(Integer num) {
+		MyData obj=new MyData();
+		 obj.num= num;
+		 return obj;
+		//this.num = num;
+	}
+	
+	public MyData() {}
+	
 }

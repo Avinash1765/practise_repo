@@ -81,7 +81,7 @@ const postStyles = makeStyles({
 });
 
 function post(props) {
-      console.log('post id ', props.post.postCreationString);
+    //  console.log('post id ', props.post.postCreationString);
       const dispatch= useDispatch();
 
       let likeIconRef= null;
@@ -113,7 +113,7 @@ function post(props) {
       }
 
       const likeIconClasses= likeIconClassArr.join(' ');
-      console.log('currentUserId in post '+ props.currentUserId);
+  //    console.log('currentUserId in post '+ props.currentUserId);
       return (
         <Box boxShadow={3} className={classes.overAllPostContainer}>
             <Box className={classes.postContainer}>

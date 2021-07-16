@@ -1,4 +1,4 @@
-import {USER_FEED_UPDATE, FETCH_BROWSE_USERS, TOGGLE_FOLLOWING} from '../NextConnectConstants';
+import {USER_FEED_UPDATE, FETCH_BROWSE_USERS, TOGGLE_FOLLOWING, POLL_DATA} from '../NextConnectConstants';
 
 
 const initialState = {
@@ -8,11 +8,21 @@ const initialState = {
       isAuthenticated: false,
       userId: null,
       followingUserList: null,
-      browseUserList: {}
+      browseUserList: {},
+      pollNumber: 400,
+      feedNotifications: false
 };
 
 
 const reducer= (state = initialState, action) => {
+
+      state.feedNotifications = localStorage.getItem('INSTANCE_TOKEN') !== null ;
+
+      if (action.type === POLL_DATA){
+      //  console.log(action.data.num);
+        let newState= {...state, pollNumber: action.data.num};
+        return newState;
+      }
 
       if(action.type === TOGGLE_FOLLOWING){
         if(!action.followingFlag){
